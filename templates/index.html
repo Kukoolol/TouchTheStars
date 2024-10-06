@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>BrailleVision</title>
+ <script src="https://kit.fontawesome.com/e257be1e04.js" crossorigin="anonymous"></script>
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <style>
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+ body {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ min-height: 100vh;
+ margin: 0;
+ background: #778da9;
+ font-family: 'Poppins', sans-serif;
+ color: white;
+ padding: 20px;
+ transition: all 0.5s ease;
+ }
+ h3 {
+ margin-top:5px;
+ display: flex; /* Use flexbox for alignment */
+ align-items: center; /* Align items vertically */
+ margin-left: 10px;
+ text-align: left;
+ margin-bottom: 1px;
+ font-size: 1.8em;
+ font-weight: 600;
+ color: #e0e1dd;
+ text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h3 span {
+ margin-top:inherit;
+ font-size: 2em; /* Adjust font size as needed */
+ font-weight: inherit; /* Inherit font weight */
+ color: inherit; /* Inherit text color */
+ text-shadow: inherit; /* Inherit text shadow */
+ margin-left: 10px; /* Adjust margin as needed */
+ margin-bottom:18px;
+}
+
+ #media-container {
+ display: flex;
+ flex-direction: row;
+ gap: 20px;
+ justify-content: center;
+ align-items: center;
+ margin-bottom: 20px;
+ }
+ #video, #canvas {
+ width: 100%;
+ max-width: 520px;
+ height: 100%;
+ height: auto;
+ border: 2px solid #fff;
+ border-radius: 16px;
+ box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+ display: block;
+ }
+ button {
+ 
+ font-weight: 600;
+ padding: 12px 24px;
+ font-size: 16px;
+ border: none;
+ border-radius: 8px;
+ background-color: #415a77;
+ color: #e0e1dd;
+ cursor: pointer;
+ font-family: 'Poppins', sans-serif;
+ transform: translateY(-10%);
+ transition: background-color 0.3s ease, transform 0.3s ease;
+ margin: 5px;
+ width: 180px;
+ text-align: center;
+ }
+ button:hover {
+ background-color: #1b263b;
+ transform: scale(1.05);
+ }
+ button:active {
+ transform: scale(0.95);
+ }
+ #message, #error {
+ font-size: 14px;
+ margin-top: 10px;
+ text-align: center;
+ width: 100%;
+ max-width: 320px;
+ }
+ #message {
+ color: #28a745;
+ }
+ #error {
+ color: #dc3545;
+ }
+ .hidden {
+ display: none;
+ }
+ h1{
+ color:#e0e1dd;
+ margin-top:80px;
+ }
+ header {
+ width: 100%;
+ background-color: #1b263b;
+ color: white;
+ border: 2px solid #fff;
+ position: fixed; /* Fixes the header at the top of the page */
+ top: 0;
+ left: 0;
+ z-index: 1000; /* Ensures the header stays on top of other content */
+ }
+ #nav {
+ 
+    margin-left:55%;
+ font-size: 1.4em; /* Adjust font size as needed */
+ font-weight: inherit; /* Inherit font weight */
+ color: inherit; /* Inherit text color */
+ text-shadow: inherit; /* Inherit text shadow */
+ /* Adjust margin as needed */
+ margin-bottom:18px;
+}
+ #paragraph-container{
+ border: 3px solid #e0e1dd;;
+ background: #415a77;
+ padding: 10px;
+ margin-bottom:30px;
+ border-radius:13px;
+ }
+ #convertButton {
+ padding: 10px 20px;
+ font-size: 16px;
+ background-color: #1B263B;
+ color: white;
+ border: none;
+ border-radius: 5px;
+ cursor: pointer;
+ transition: background-color 0.3s;
+ }
+ #convertButton:hover {
+ background-color: #1B263B;
+ }
+ .braille-container {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ margin-top: 30px;
+ font-size: 24px;
+ }
+ .braille-row {
+ display: flex;
+ justify-content: center;
+ margin-bottom: 10px;
+ }
+ .braille-column {
+ display: inline-block;
+ width: 60px;
+ height: 90px;
+ text-align: center;
+ background-color: #fff;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ border-radius: 5px;
+ padding: 10px;
+ margin-right: 20px;
+ }
+ .braille-dot {
+ width: 20px;
+ height: 20px;
+ border-radius: 50%;
+ background-color: #ccc;
+ margin: 2px;
+ }
+ .dot-filled {
+ background-color: #333;
+ }
+ 
+ </style>
+</head>
+<body>
+ <header>
+ <!-- Header content goes here -->
+ 
+ <h3> <span>⠗</span> EduBraille <span id="nav"><i class="fa-brands fa-twitter"></i> &nbsp;&nbsp;<i class="fa-brands fa-instagram"></i>&nbsp; &nbsp;<i class="fa-brands fa-discord"></i>&nbsp; &nbsp;<i class="fa-brands fa-facebook"></i>&nbsp;
+&nbsp;<i class="fa-solid fa-bars"></i></span></h3>
+ </header>
+ <div id="photo-section">
+ 
+ <div id="media-container">
+ <video id="video" autoplay></video>
+ <canvas id="canvas"></canvas>
+ </div>
+ <div>
+ <button id="snap">Snap Photo&nbsp; <i class="fa-solid fa-camera"></i></button>
+ <button id="reset">Reset&nbsp; <i class="fa-solid fa-rotate-right"></i></button>
+ <button id="practice">Practice&nbsp; <i class="fa-solid fa-pen"></i></button>
+ </div>
+ <div id="message"></div>
+ <div id="error"></div>
+ </div>
+
+ <div id="paragraph-section" class="hidden">
+ <h1>Practice Paragraphs</h1>
+ <div id="paragraph-container"></div>
+ <div>
+ <button id="generate">Random Paragraph</button>
+ <button id="back">Back to Photo Capture</button>
+ </div>
+ </div>
+ <div id="brailleContainer" ></div>
+ <script>
+ console.log("sfd");
+ // Access the video stream from the webcam
+ var video = document.getElementById('video');
+ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+ navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+ video.srcObject = stream;
+ video.play();
+ });
+ }
+
+ var canvas = document.getElementById('canvas');
+ var context = canvas.getContext('2d');
+ var formData = new FormData();
+
+ // Capture the photo and upload
+ document.getElementById("snap").addEventListener("click", function() {
+ canvas.width = video.videoWidth;
+ canvas.height = video.videoHeight;
+ context.drawImage(video, 0, 0, canvas.width, canvas.height);
+ var img = canvas.toDataURL('image/png');
+ formData.append('image', img);
+
+ $.ajax({
+ url: "http://127.0.0.1:5000/upload",
+ type: "POST",
+ processData: false,
+ contentType: false,
+ cache: false,
+ data: formData,
+ success: function(response) {
+ document.getElementById('message').textContent = "Image uploaded successfully!";
+ document.getElementById('error').textContent = "";
+ },
+ error: function(jqXHR, textStatus, errorThrown) {
+ document.getElementById('error').textContent = "Image upload failed: " + textStatus + ", " + errorThrown;
+ document.getElementById('message').textContent = "";
+ }
+ });
+ });
+
+ // Reset the canvas
+ document.getElementById("reset").addEventListener("click", function() {
+ context.clearRect(0, 0, canvas.width, canvas.height);
+ document.getElementById('message').textContent = "";
+ document.getElementById('error').textContent = "";
+ });
+
+ // Navigate to the paragraph section
+ document.getElementById("practice").addEventListener("click", function() {
+ document.getElementById('photo-section').classList.add('hidden');
+ document.getElementById('paragraph-section').classList.remove('hidden');
+ });
+
+ // Back to photo capture section
+ document.getElementById("back").addEventListener("click", function() {
+ document.getElementById('photo-section').classList.remove('hidden');
+ document.getElementById('paragraph-section').classList.add('hidden');
+ });
+
+ // Generate a random paragraph
+ function getRandomParagraph() {
+ const subjects = ["The cat", "A dinosaur", "The president", "My friend", "An artist", "The robot", "A scientist"];
+ const verbs = ["jumps", "runs", "paints", "invents", "flies", "drives", "dances"];
+ const objects = ["a car", "a house", "a book", "a pizza", "a spaceship", "a computer", "a phone"];
+ const places = ["in the park", "at the museum", "in the city", "on the moon", "under the sea", "in the jungle", "in space"];
+
+ let paragraph = "";
+ for (let i = 0; i < 50; i++) { // Adjust the loop to generate longer paragraphs
+ paragraph += `${subjects[Math.floor(Math.random() * subjects.length)]} ${verbs[Math.floor(Math.random() * verbs.length)]} ${objects[Math.floor(Math.random() * objects.length)]} ${places[Math.floor(Math.random() * places.length)]}. `;
+ }
+ startBrailleDisplay(paragraph);
+ return paragraph;
+ }
+
+ document.getElementById("generate").addEventListener("click", function() {
+ document.getElementById('paragraph-container').textContent = getRandomParagraph();
+ });
+ console.log("flsdf");
+ 
+ 
+ function convertToBraille(input) {
+ const brailleMap = {
+ 'a': [[1, 0], [0, 0], [0, 0]],
+ 'b': [[1, 1], [0, 0], [0, 0]],
+ 'c': [[1, 0], [1, 0], [0, 0]],
+ 'd': [[1, 0], [1, 1], [0, 0]],
+ 'e': [[1, 0], [0, 1], [0, 0]],
+ 'f': [[1, 1], [1, 0], [0, 0]],
+ 'g': [[1, 1], [1, 1], [0, 0]],
+ 'h': [[1, 0], [1, 1], [0, 0]],
+ 'i': [[0, 1], [1, 0], [0, 0]],
+ 'j': [[0, 1], [1, 1], [0, 0]],
+ 'k': [[1, 0], [0, 0], [1, 0]],
+ 'l': [[1, 1], [0, 0], [1, 0]],
+ 'm': [[1, 0], [1, 0], [1, 0]],
+ 'n': [[1, 0], [1, 1], [1, 0]],
+ 'o': [[1, 0], [0, 1], [1, 0]],
+ 'p': [[1, 1], [1, 0], [1, 0]],
+ 'q': [[1, 1], [1, 1], [1, 0]],
+ 'r': [[1, 0], [1, 1], [1, 0]],
+ 's': [[0, 1], [1, 0], [1, 0]],
+ 't': [[0, 1], [1, 1], [1, 0]],
+ 'u': [[1, 0], [0, 0], [1, 1]],
+ 'v': [[1, 1], [0, 0], [1, 1]],
+ 'w': [[0, 1], [1, 1], [0, 1]],
+ 'x': [[1, 0], [1, 0], [1, 1]],
+ 'y': [[1, 0], [1, 1], [1, 1]],
+ 'z': [[1, 0], [0, 1], [1, 1]],
+ '0': [[0, 1], [1, 1], [0, 0]]
+ };
+
+ let brailleOutput = input.toLowerCase().split('').map(ch => brailleMap[ch] || [[0, 0], [0, 0], [0, 0]]);
+ return brailleOutput;
+ }
+
+ function startBrailleDisplay(input) {
+ 
+ let brailleOutput = convertToBraille(input);
+ let brailleContainer = document.getElementById('brailleContainer');
+ brailleContainer.innerHTML = '';
+
+ let i = 0;
+ function displayNextCharacter() {
+ if (i < brailleOutput.length) {
+ let rows = brailleOutput[i];
+ let column = '<div class="braille-column">';
+ rows.forEach(row => {
+ column += '<div class="braille-row">';
+ row.forEach(dot => {
+ column += `<div class="braille-dot ${dot ? 'dot-filled' : ''}"> </div>`;
+ });
+ column += '</div>';
+ });
+ column += '</div>';
+ brailleContainer.innerHTML = column;
+
+ i++;
+ setTimeout(displayNextCharacter, 1000);
+ }
+ }
+
+ displayNextCharacter();
+ 
+ }
+ 
+ 
+ 
+</script>
+</body>
+</html>
